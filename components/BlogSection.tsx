@@ -10,13 +10,21 @@ const BlogSection: React.FC = () => {
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadPosts();
   }, []);
 
-  const loadPosts = () => {
-    setPosts(blogService.getAllPosts());
+  const loadPosts = async () => {
+    try {
+        const data = await blogService.getAllPosts();
+        setPosts(data);
+    } catch (e) {
+        console.error("Failed to load logs");
+    } finally {
+        setLoading(false);
+    }
   };
 
   return (
@@ -50,8 +58,14 @@ const BlogSection: React.FC = () => {
               <div className="col-span-2">Category</div>
               <div className="col-span-1 text-right">Action</div>
            </div>
+           
+           {loading && (
+               <div className="text-center py-12 font-mono text-green-500/50 animate-pulse">
+                   ACCESSING ARCHIVES...
+               </div>
+           )}
 
-           {posts.map((post) => (
+           {!loading && posts.map((post) => (
              <div 
                 key={post.id}
                 onClick={() => setSelectedPost(post)}
@@ -91,7 +105,7 @@ const BlogSection: React.FC = () => {
              </div>
            ))}
 
-           {posts.length === 0 && (
+           {!loading && posts.length === 0 && (
              <div className="text-center py-12 border border-dashed border-green-900">
                <p className="text-gray-500 font-mono">ARCHIVE EMPTY or CORRUPTED.</p>
              </div>

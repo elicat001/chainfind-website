@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Save, Trash2, Plus, Terminal, Lock, LogOut } from 'lucide-react';
+import { X, Save, Trash2, Plus, Terminal, Lock, LogOut, RefreshCw, Wifi } from 'lucide-react';
 import { BlogPost } from '../types';
 import { blogService } from '../services/blogService';
 import { CyberButton, GlitchText } from './HackerUI';
+import { API_CONFIG } from '../config';
 
 interface BlogAdminProps {
   isOpen: boolean;
@@ -15,6 +16,8 @@ export const BlogAdmin: React.FC<BlogAdminProps> = ({ isOpen, onClose, onUpdate 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('');
   
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
@@ -26,20 +29,43 @@ export const BlogAdmin: React.FC<BlogAdminProps> = ({ isOpen, onClose, onUpdate 
     }
   }, [isOpen, isAuthenticated]);
 
+  const simulateLoading = async (text: string, action: () => Promise<void>) => {
+    setLoading(true);
+    setLoadingText(text);
+    try {
+        await action();
+    } catch (err) {
+        console.error(err);
+        alert("SYSTEM ERROR: CONNECTION REFUSED");
+    } finally {
+        setLoading(false);
+        setLoadingText('');
+    }
+  };
+
   const loadPosts = () => {
-    setPosts(blogService.getAllPosts());
+    simulateLoading('FETCHING_DATA...', async () => {
+        const data = await blogService.getAllPosts();
+        setPosts(data);
+    });
   };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock authentication - Simple hardcoded password for demo
-    if (password === 'admin' || password === 'root' || password === 'chainfind') {
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('ACCESS DENIED: INVALID CREDENTIALS');
-      setPassword('');
-    }
+    setLoading(true);
+    setLoadingText('AUTHENTICATING WITH REMOTE SERVER...');
+    
+    // Simulate Network Request for Login
+    setTimeout(() => {
+        if (password === 'admin' || password === 'root' || password === 'chainfind') {
+          setIsAuthenticated(true);
+          setError('');
+        } else {
+          setError('ACCESS DENIED: INVALID CREDENTIALS');
+          setPassword('');
+        }
+        setLoading(false);
+    }, 1500);
   };
 
   const handleCreateNew = () => {
@@ -64,9 +90,11 @@ export const BlogAdmin: React.FC<BlogAdminProps> = ({ isOpen, onClose, onUpdate 
 
   const handleDelete = (id: string) => {
     if (window.confirm('CONFIRM DELETION? THIS ACTION CANNOT BE UNDONE.')) {
-      blogService.deletePost(id);
-      loadPosts();
-      onUpdate();
+      simulateLoading('DELETING_RECORD...', async () => {
+          await blogService.deletePost(id);
+          await blogService.getAllPosts().then(setPosts);
+          onUpdate();
+      });
     }
   };
 
@@ -82,10 +110,12 @@ export const BlogAdmin: React.FC<BlogAdminProps> = ({ isOpen, onClose, onUpdate 
         editingPost.preview = editingPost.content.slice(0, 120).replace(/[#*`]/g, '') + '...';
     }
 
-    blogService.savePost(editingPost);
-    loadPosts();
-    onUpdate();
-    setEditingPost(null);
+    simulateLoading('UPLOADING_TO_MAINFRAME...', async () => {
+        await blogService.savePost(editingPost);
+        await blogService.getAllPosts().then(setPosts);
+        onUpdate();
+        setEditingPost(null);
+    });
   };
 
   if (!isOpen) return null;
@@ -98,12 +128,20 @@ export const BlogAdmin: React.FC<BlogAdminProps> = ({ isOpen, onClose, onUpdate 
         <div className="bg-green-900/20 border-b border-green-500/30 p-3 flex justify-between items-center">
           <div className="flex items-center gap-2 text-green-500 font-mono font-bold">
             <Terminal size={18} />
-            <span>CMS_ROOT_ACCESS // V1.0.4</span>
+            <span>CMS_ROOT_ACCESS // PORT:8080</span>
           </div>
           <button onClick={onClose} className="text-green-500 hover:text-white transition-colors">
             <X size={24} />
           </button>
         </div>
+
+        {/* Overlay Loading State */}
+        {loading && (
+            <div className="absolute inset-0 z-50 bg-black/80 flex flex-col items-center justify-center">
+                <div className="w-12 h-12 border-4 border-green-900 border-t-green-500 rounded-full animate-spin mb-4"></div>
+                <GlitchText text={loadingText} className="text-green-400 font-mono tracking-widest" />
+            </div>
+        )}
 
         {/* Content */}
         <div className="flex-1 overflow-hidden flex p-4">
@@ -236,6 +274,18 @@ export const BlogAdmin: React.FC<BlogAdminProps> = ({ isOpen, onClose, onUpdate 
                 </div>
             </div>
           )}
+        </div>
+        
+        {/* Connection Status Footer */}
+        <div className="bg-black border-t border-green-900/50 p-2 flex justify-between items-center text-[10px] font-mono text-gray-600">
+             <div className="flex items-center gap-2">
+                 <div className={`w-2 h-2 rounded-full ${API_CONFIG.USE_MOCK_API ? 'bg-yellow-500' : 'bg-green-500'} animate-pulse`}></div>
+                 <span>MODE: {API_CONFIG.USE_MOCK_API ? 'SIMULATION (LOCAL_STORAGE)' : 'LIVE_UPLINK'}</span>
+             </div>
+             <div className="flex items-center gap-2">
+                 <Wifi size={10} />
+                 <span>TARGET: {API_CONFIG.API_BASE_URL}</span>
+             </div>
         </div>
       </div>
     </div>

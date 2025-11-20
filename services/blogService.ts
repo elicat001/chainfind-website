@@ -1,5 +1,6 @@
 
 import { BlogPost } from '../types';
+import { API_CONFIG } from '../config';
 
 const STORAGE_KEY = 'chainfind_blog_db_v1';
 
@@ -87,40 +88,81 @@ Our "Chainfind Sentinel" tool now automatically flags this pattern during CI/CD 
   }
 ];
 
-export const blogService = {
-  getAllPosts: (): BlogPost[] => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_POSTS));
-      return DEFAULT_POSTS;
-    }
-    try {
-      return JSON.parse(stored);
-    } catch (e) {
-      return DEFAULT_POSTS;
-    }
-  },
+// Helper for mock latency
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-  savePost: (post: BlogPost): void => {
-    const posts = blogService.getAllPosts();
-    const existingIndex = posts.findIndex(p => p.id === post.id);
-    
-    if (existingIndex >= 0) {
-      posts[existingIndex] = post;
-    } else {
-      posts.unshift(post); // Add new post to top
-    }
-    
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-  },
-
-  deletePost: (id: string): void => {
-    const posts = blogService.getAllPosts();
-    const filtered = posts.filter(p => p.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
-  },
+class BlogService {
   
-  resetDB: (): void => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_POSTS));
+  async getAllPosts(): Promise<BlogPost[]> {
+    if (API_CONFIG.USE_MOCK_API) {
+      await delay(API_CONFIG.SIMULATE_LATENCY_MS);
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_POSTS));
+        return DEFAULT_POSTS;
+      }
+      try {
+        return JSON.parse(stored);
+      } catch (e) {
+        return DEFAULT_POSTS;
+      }
+    } else {
+      // Real Backend Call
+      const response = await fetch(`${API_CONFIG.API_BASE_URL}/posts`);
+      if (!response.ok) throw new Error('Network response was not ok');
+      return await response.json();
+    }
   }
-};
+
+  async savePost(post: BlogPost): Promise<void> {
+    if (API_CONFIG.USE_MOCK_API) {
+      await delay(API_CONFIG.SIMULATE_LATENCY_MS);
+      const posts = await this.getMockPosts(); // internal helper
+      const existingIndex = posts.findIndex(p => p.id === post.id);
+      
+      if (existingIndex >= 0) {
+        posts[existingIndex] = post;
+      } else {
+        posts.unshift(post);
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+    } else {
+      // Real Backend Call
+      const method = post.id ? 'PUT' : 'POST'; // Assuming logic for update/create
+      const response = await fetch(`${API_CONFIG.API_BASE_URL}/posts`, {
+        method: 'POST', // Or PUT based on ID existence in real DB
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(post)
+      });
+      if (!response.ok) throw new Error('Failed to save post');
+    }
+  }
+
+  async deletePost(id: string): Promise<void> {
+    if (API_CONFIG.USE_MOCK_API) {
+      await delay(API_CONFIG.SIMULATE_LATENCY_MS);
+      const posts = await this.getMockPosts();
+      const filtered = posts.filter(p => p.id !== id);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+    } else {
+      // Real Backend Call
+      const response = await fetch(`${API_CONFIG.API_BASE_URL}/posts/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to delete post');
+    }
+  }
+
+  // Private helper for mock mode to avoid circular async calls
+  private getMockPosts(): Promise<BlogPost[]> {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) return Promise.resolve(DEFAULT_POSTS);
+    try {
+      return Promise.resolve(JSON.parse(stored));
+    } catch {
+      return Promise.resolve(DEFAULT_POSTS);
+    }
+  }
+}
+
+export const blogService = new BlogService();

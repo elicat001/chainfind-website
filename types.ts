@@ -10,6 +10,7 @@ export interface ChatMessage {
   role: MessageRole;
   text: string;
   isTyping?: boolean;
+  isCustomUI?: boolean; // New flag for rendering custom components in chat
 }
 
 export interface ServiceItem {
@@ -32,4 +33,16 @@ export interface BlogPost {
   content: string;
   author: string;
   readTime: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  category: 'AI_AGENTS' | 'BLOCKCHAIN' | 'SECURITY' | 'TOOLS';
+  version: string;
+  status: 'ONLINE' | 'BETA' | 'DEV';
+  icon: any; // Lucide icon component
+  link: string;
+  priceLabel: string;
 }

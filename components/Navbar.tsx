@@ -22,6 +22,13 @@ import React, { useState, useEffect } from 'react';
       }, []);
     
       const scrollToSection = (id: string) => {
+        // Special handling for Contact - point to Terminal
+        if (id === 'contact') {
+             const element = document.getElementById('system_access');
+             if (element) element.scrollIntoView({ behavior: 'smooth' });
+             return;
+        }
+
         const element = document.getElementById(id);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
@@ -55,7 +62,7 @@ import React, { useState, useEffect } from 'react';
             
             {/* Center Navigation */}
             <div className="hidden md:flex items-center gap-1">
-              {['SERVICES', 'ABOUT', 'BLOG', 'SYSTEM_ACCESS', 'CONTACT'].map((item) => (
+              {['SERVICES', 'PRODUCTS', 'ABOUT', 'BLOG', 'SYSTEM_ACCESS', 'CONTACT'].map((item) => (
                 <button 
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase())}

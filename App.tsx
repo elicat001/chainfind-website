@@ -5,6 +5,7 @@ import TerminalChat from './components/TerminalChat';
 import MatrixRain from './components/MatrixRain';
 import NetworkBackground from './components/NetworkBackground';
 import BlogSection from './components/BlogSection';
+import ProductShowcase from './components/ProductShowcase';
 import { GlitchText, CyberButton, SectionHeader, BootSequence } from './components/HackerUI';
 import { StructuredData } from './components/StructuredData';
 import { Activity, Code, Globe, Lock, Server, ShieldCheck, ChevronDown, Hexagon, Terminal as TerminalIcon, Database, Key, Mail, Bot, Layers, Link } from 'lucide-react';
@@ -64,16 +65,16 @@ const App: React.FC = () => {
               </CyberButton>
               <CyberButton 
                 variant="secondary"
-                onClick={() => document.getElementById('services')?.scrollIntoView({behavior: 'smooth'})}
+                onClick={() => document.getElementById('products')?.scrollIntoView({behavior: 'smooth'})}
                 aria-label="Browse Services"
               >
-                BROWSE_PROTOCOLS
+                BROWSE_ARSENAL
               </CyberButton>
             </div>
           </div>
           
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-green-500/50 cursor-pointer"
-               onClick={() => document.getElementById('about')?.scrollIntoView({behavior: 'smooth'})}
+               onClick={() => document.getElementById('services')?.scrollIntoView({behavior: 'smooth'})}
                aria-label="Scroll Down"
           >
              <ChevronDown size={32} />
@@ -82,63 +83,6 @@ const App: React.FC = () => {
           {/* Decorative Corner Elements */}
           <div className="absolute top-32 left-10 w-32 h-32 border-l-2 border-t-2 border-green-500/20 hidden md:block"></div>
           <div className="absolute bottom-20 right-10 w-32 h-32 border-r-2 border-b-2 border-green-500/20 hidden md:block"></div>
-        </section>
-
-        {/* ABOUT SECTION */}
-        <section id="about" className="py-32 relative bg-black/80 backdrop-blur-sm">
-          <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-16 items-center">
-              <div className="space-y-8">
-                 <SectionHeader title="IDENTITY_MATRIX" subtitle="ABOUT CHAINFIND" />
-                 
-                 <div className="bg-gray-900/50 p-6 border-l-4 border-green-500 clip-corner-2 relative group">
-                   <div className="absolute -inset-1 bg-green-500/10 blur transition-opacity opacity-0 group-hover:opacity-100"></div>
-                   <p className="text-gray-300 leading-relaxed font-mono relative z-10">
-                     <strong>Chainfind</strong> is an elite collective of technologists operating at the intersection of <strong>Artificial Intelligence</strong>, <strong>Blockchain</strong>, and <strong>Network Security</strong>. We don't just build software; we architect decentralized ecosystems and intelligent agents that operate securely in the shadows of the digital infrastructure.
-                   </p>
-                 </div>
-
-                 <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { label: "AI MODELS", val: "TRAINED" },
-                      { label: "BLOCKS", val: "VERIFIED" },
-                      { label: "LATENCY", val: "<12ms" },
-                      { label: "THREATS", val: "NEUTRALIZED" }
-                    ].map((stat, i) => (
-                      <div key={i} className="border border-green-500/20 p-4 bg-black/40 hover:bg-green-900/20 transition-colors">
-                        <div className="text-xs text-gray-500 mb-1">{stat.label}</div>
-                        <div className="text-xl text-green-400 font-bold font-tech">{stat.val}</div>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-              
-              <div className="relative">
-                 <div className="absolute inset-0 bg-green-500/20 blur-3xl rounded-full opacity-20"></div>
-                 <div className="border border-green-500/30 bg-black/90 p-1 relative">
-                   {/* Fake Terminal Window */}
-                   <div className="bg-gray-900 p-2 flex gap-2 border-b border-gray-800">
-                     <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                     <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                     <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                   </div>
-                   <div className="p-6 font-mono text-xs md:text-sm text-green-300 space-y-2">
-                     <div className="flex"><span className="text-blue-400 mr-2">root@chainfind:~$</span> ./deploy_smart_contract.sh</div>
-                     <div className="text-gray-400">Compiling Solidity v0.8.20... [OK]</div>
-                     <div className="text-gray-400">Training Neural Net... [EPOCH 100/100]</div>
-                     <div className="text-gray-400">Auditing Security Protocols... [PASSED]</div>
-                     <div className="text-green-500 font-bold mt-4">>>> DEPLOYMENT SUCCESSFUL. HASH: 0x7f...3a2</div>
-                     <div className="animate-pulse mt-2">_</div>
-                   </div>
-                   
-                   {/* Decorative Grid */}
-                   <div className="absolute -bottom-6 -right-6 text-green-800/40">
-                     <Hexagon size={120} strokeWidth={1} />
-                   </div>
-                 </div>
-              </div>
-            </div>
-          </div>
         </section>
 
         {/* SERVICES SECTION */}
@@ -211,6 +155,66 @@ const App: React.FC = () => {
           </div>
         </section>
 
+        {/* PRODUCT SHOWCASE SECTION */}
+        <ProductShowcase />
+
+        {/* ABOUT SECTION */}
+        <section id="about" className="py-32 relative bg-black/80 backdrop-blur-sm">
+          <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-2 gap-16 items-center">
+              <div className="space-y-8">
+                 <SectionHeader title="IDENTITY_MATRIX" subtitle="ABOUT CHAINFIND" />
+                 
+                 <div className="bg-gray-900/50 p-6 border-l-4 border-green-500 clip-corner-2 relative group">
+                   <div className="absolute -inset-1 bg-green-500/10 blur transition-opacity opacity-0 group-hover:opacity-100"></div>
+                   <p className="text-gray-300 leading-relaxed font-mono relative z-10">
+                     <strong>Chainfind</strong> is an elite collective of technologists operating at the intersection of <strong>Artificial Intelligence</strong>, <strong>Blockchain</strong>, and <strong>Network Security</strong>. We don't just build software; we architect decentralized ecosystems and intelligent agents that operate securely in the shadows of the digital infrastructure.
+                   </p>
+                 </div>
+
+                 <div className="grid grid-cols-2 gap-4">
+                    {[
+                      { label: "AI MODELS", val: "TRAINED" },
+                      { label: "BLOCKS", val: "VERIFIED" },
+                      { label: "LATENCY", val: "<12ms" },
+                      { label: "THREATS", val: "NEUTRALIZED" }
+                    ].map((stat, i) => (
+                      <div key={i} className="border border-green-500/20 p-4 bg-black/40 hover:bg-green-900/20 transition-colors">
+                        <div className="text-xs text-gray-500 mb-1">{stat.label}</div>
+                        <div className="text-xl text-green-400 font-bold font-tech">{stat.val}</div>
+                      </div>
+                    ))}
+                 </div>
+              </div>
+              
+              <div className="relative">
+                 <div className="absolute inset-0 bg-green-500/20 blur-3xl rounded-full opacity-20"></div>
+                 <div className="border border-green-500/30 bg-black/90 p-1 relative">
+                   {/* Fake Terminal Window */}
+                   <div className="bg-gray-900 p-2 flex gap-2 border-b border-gray-800">
+                     <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                     <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                     <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                   </div>
+                   <div className="p-6 font-mono text-xs md:text-sm text-green-300 space-y-2">
+                     <div className="flex"><span className="text-blue-400 mr-2">root@chainfind:~$</span> ./deploy_smart_contract.sh</div>
+                     <div className="text-gray-400">Compiling Solidity v0.8.20... [OK]</div>
+                     <div className="text-gray-400">Training Neural Net... [EPOCH 100/100]</div>
+                     <div className="text-gray-400">Auditing Security Protocols... [PASSED]</div>
+                     <div className="text-green-500 font-bold mt-4">>>> DEPLOYMENT SUCCESSFUL. HASH: 0x7f...3a2</div>
+                     <div className="animate-pulse mt-2">_</div>
+                   </div>
+                   
+                   {/* Decorative Grid */}
+                   <div className="absolute -bottom-6 -right-6 text-green-800/40">
+                     <Hexagon size={120} strokeWidth={1} />
+                   </div>
+                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* BLOG SECTION */}
         <BlogSection />
 
@@ -220,7 +224,7 @@ const App: React.FC = () => {
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center mb-12">
               <GlitchText text="CHAIN_CORE V2.5" as="h2" className="text-4xl font-bold text-white font-tech mb-4" />
-              <p className="text-green-500/60 text-sm font-mono uppercase tracking-widest">Direct Uplink Established // Query the Mainframe</p>
+              <p className="text-green-500/60 text-sm font-mono uppercase tracking-widest">Direct Uplink Established // Type <span className="text-white font-bold">/signal</span> to contact</p>
             </div>
             
             <div className="relative">
@@ -237,73 +241,6 @@ const App: React.FC = () => {
                <span className="flex items-center gap-2"><Database size={12}/> LOGS: SECURE</span>
             </div>
           </div>
-        </section>
-
-        {/* CONTACT SECTION */}
-        <section id="contact" className="py-32 container mx-auto px-4">
-           <div className="max-w-4xl mx-auto relative">
-             {/* Cyber Container */}
-             <div className="absolute inset-0 bg-green-500/5 blur-xl"></div>
-             <div className="relative bg-black/80 border border-green-500/30 p-8 md:p-12 clip-corner-2">
-                <div className="flex flex-col md:flex-row justify-between items-start gap-12">
-                  
-                  <div className="flex-1">
-                    <h2 className="text-3xl font-bold text-white font-tech mb-6 flex items-center gap-3">
-                      <Globe className="text-green-500" /> TRANSMIT_SIGNAL
-                    </h2>
-                    <p className="text-gray-400 mb-8">
-                      Ready to upgrade your infrastructure? Open a channel with our deployment team. 
-                      Response time: &lt; 2 hours.
-                    </p>
-                    
-                    <div className="space-y-6">
-                       <div className="group flex items-center gap-4 p-4 bg-green-900/10 border border-green-500/10 hover:border-green-500/50 transition-colors">
-                          <div className="p-2 bg-green-500/10 text-green-500 group-hover:text-white group-hover:bg-green-500 transition-colors">
-                             <Mail size={20} />
-                          </div>
-                          <div className="flex flex-col gap-1">
-                             <div className="text-xs text-gray-500 uppercase tracking-wider">Secure Uplink (Email)</div>
-                             <a href="mailto:qin@chainfind.cn" className="text-green-400 hover:text-white font-mono transition-colors">qin@chainfind.cn</a>
-                             <a href="mailto:qin@bazihui.asia" className="text-green-500/70 hover:text-white font-mono text-xs transition-colors">qin@bazihui.asia</a>
-                          </div>
-                       </div>
-                       
-                       <div className="group flex items-center gap-4 p-4 bg-green-900/10 border border-green-500/10 hover:border-green-500/50 transition-colors">
-                          <div className="p-2 bg-green-500/10 text-green-500 group-hover:text-white group-hover:bg-green-500 transition-colors">
-                             <Key size={20} />
-                          </div>
-                          <div>
-                             <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Encrypted Comm Line</div>
-                             <div className="font-mono text-xs tracking-widest text-green-600 bg-black border border-green-900/50 px-2 py-1 rounded inline-block group-hover:text-green-400 group-hover:border-green-500/50 transition-all">
-                               MTg4MjY1NzQzMzE=
-                             </div>
-                             <div className="text-[10px] text-gray-600 mt-1">[BASE64_ENCODED]</div>
-                          </div>
-                       </div>
-                    </div>
-                  </div>
-
-                  <div className="w-full md:w-auto min-w-[300px]">
-                    <form className="space-y-4">
-                       <div>
-                         <label className="block text-xs text-green-500 mb-1">IDENTIFIER</label>
-                         <input type="text" className="w-full bg-black border border-green-900 text-green-400 p-3 focus:border-green-500 focus:outline-none font-mono text-sm" placeholder="Enter Name/Alias" aria-label="Name" />
-                       </div>
-                       <div>
-                         <label className="block text-xs text-green-500 mb-1">RETURN_PATH</label>
-                         <input type="email" className="w-full bg-black border border-green-900 text-green-400 p-3 focus:border-green-500 focus:outline-none font-mono text-sm" placeholder="Enter Email" aria-label="Email" />
-                       </div>
-                       <div>
-                         <label className="block text-xs text-green-500 mb-1">PAYLOAD_MESSAGE</label>
-                         <textarea rows={4} className="w-full bg-black border border-green-900 text-green-400 p-3 focus:border-green-500 focus:outline-none font-mono text-sm" placeholder="Describe mission parameters..." aria-label="Message"></textarea>
-                       </div>
-                       <CyberButton className="w-full justify-center">EXECUTE_SEND</CyberButton>
-                    </form>
-                  </div>
-
-                </div>
-             </div>
-           </div>
         </section>
 
         {/* FOOTER */}
