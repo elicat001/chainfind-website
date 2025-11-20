@@ -201,7 +201,7 @@ const App: React.FC = () => {
                      <div className="text-gray-400">Compiling Solidity v0.8.20... [OK]</div>
                      <div className="text-gray-400">Training Neural Net... [EPOCH 100/100]</div>
                      <div className="text-gray-400">Auditing Security Protocols... [PASSED]</div>
-                     <div className="text-green-500 font-bold mt-4">>>> DEPLOYMENT SUCCESSFUL. HASH: 0x7f...3a2</div>
+                     <div className="text-green-500 font-bold mt-4">&gt;&gt;&gt; DEPLOYMENT SUCCESSFUL. HASH: 0x7f...3a2</div>
                      <div className="animate-pulse mt-2">_</div>
                    </div>
                    
