@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { SectionHeader, CyberButton } from './HackerUI';
 import { Product } from '../types';
-import { Bot, Shield, Cpu, Globe, ExternalLink, Zap, Lock, Activity, Database, Code, Box, GitBranch } from 'lucide-react';
+import { Bot, Shield, Cpu, Globe, ExternalLink, Zap, Lock, Activity, Database, Code, Box, GitBranch, TrendingUp } from 'lucide-react';
 
 const MOCK_PRODUCTS: Product[] = [
   {
@@ -80,6 +80,17 @@ const MOCK_PRODUCTS: Product[] = [
     status: 'ONLINE',
     icon: GitBranch,
     link: 'https://github.com/elicat001/Full-chain-Quantitative-Architect-Building-a-Universal-DEX-Trading-Terminal',
+    priceLabel: 'OPEN_SOURCE'
+  },
+  {
+    id: 'PROD_008',
+    name: 'BTC_QUANT_INDUSTRIAL',
+    description: 'Industrial-grade Bitcoin quantitative trading infrastructure. High-throughput order execution and strategy backtesting engine.',
+    category: 'BLOCKCHAIN',
+    version: 'v1.1.0',
+    status: 'ONLINE',
+    icon: TrendingUp,
+    link: 'https://github.com/elicat001/btc_quant_industrial',
     priceLabel: 'OPEN_SOURCE'
   }
 ];
