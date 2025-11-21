@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { SectionHeader, CyberButton } from './HackerUI';
 import { Product } from '../types';
-import { Bot, Shield, Cpu, Globe, ExternalLink, Zap, Lock, Activity, Database, Code, Box } from 'lucide-react';
+import { Bot, Shield, Cpu, Globe, ExternalLink, Zap, Lock, Activity, Database, Code, Box, GitBranch } from 'lucide-react';
 
 const MOCK_PRODUCTS: Product[] = [
   {
@@ -70,6 +70,17 @@ const MOCK_PRODUCTS: Product[] = [
     icon: Code,
     link: '#',
     priceLabel: 'FREE'
+  },
+  {
+    id: 'PROD_007',
+    name: 'QUANT_DEX_ARCHITECT',
+    description: 'Full-chain quantitative trading terminal. Universal DEX interface for cross-chain strategy execution and arbitrage.',
+    category: 'BLOCKCHAIN',
+    version: 'v1.0.0',
+    status: 'ONLINE',
+    icon: GitBranch,
+    link: 'https://github.com/elicat001/Full-chain-Quantitative-Architect-Building-a-Universal-DEX-Trading-Terminal',
+    priceLabel: 'OPEN_SOURCE'
   }
 ];
 
