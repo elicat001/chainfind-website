@@ -17,24 +17,27 @@ const CodeBlock: React.FC<{ code: string; language: string }> = ({ code, languag
   };
 
   const highlight = (line: string) => {
-    // Basic tokenizer regex for JS/TS/Solidity/Python
-    const tokenRegex = /(\b(?:const|let|var|function|return|if|else|for|while|class|import|from|export|async|await|public|private|contract|uint|bool|string|bytes|address|mapping|require|revert|emit|event|constructor|modifier|struct|enum|interface|true|false|null|undefined|void|this|new|try|catch|super|msg|block|tx)\b)|(".*?"|'.*?')|(\/\/.*)/g;
+    // Basic tokenizer regex for JS/TS/Solidity/Python/CSS/HTML
+    // Matches keywords, strings, comments
+    const tokenRegex = /(\b(?:const|let|var|function|return|if|else|for|while|class|import|from|export|async|await|public|private|contract|uint|bool|string|bytes|address|mapping|require|revert|emit|event|constructor|modifier|struct|enum|interface|type|implements|extends|true|false|null|undefined|void|this|new|try|catch|super|msg|block|tx|console|log|div|span|className|id)\b)|(".*?"|'.*?'|`.*?`)|(\/\/.*)/g;
     
-    const parts = line.split(tokenRegex).filter(part => part);
+    // Split and filter out undefined/empty matches from capturing groups
+    const parts = line.split(tokenRegex).filter(part => part !== undefined && part !== '');
 
     return parts.map((part, index) => {
        if (/^(\/\/.*)/.test(part)) return <span key={index} className="text-gray-500 italic">{part}</span>; // Comments
-       if (/^(".*"|'.*')/.test(part)) return <span key={index} className="text-yellow-300">{part}</span>; // Strings
-       if (/^(const|let|var|function|contract|class|struct|enum|interface)$/.test(part)) return <span key={index} className="text-purple-400 font-bold">{part}</span>; // Declarations
-       if (/^(return|if|else|for|while|try|catch|import|from|export|new|this|super)$/.test(part)) return <span key={index} className="text-pink-400">{part}</span>; // Control flow
+       if (/^(".*"|'.*'|`.*`)/.test(part)) return <span key={index} className="text-yellow-300">{part}</span>; // Strings
+       if (/^(const|let|var|function|contract|class|struct|enum|interface|type)$/.test(part)) return <span key={index} className="text-purple-400 font-bold">{part}</span>; // Declarations
+       if (/^(return|if|else|for|while|try|catch|import|from|export|new|this|super|implements|extends)$/.test(part)) return <span key={index} className="text-pink-400">{part}</span>; // Control flow
        if (/^(uint|bool|string|bytes|address|mapping|void|true|false|null|undefined)$/.test(part)) return <span key={index} className="text-orange-400">{part}</span>; // Types/Values
-       if (/^(public|private|async|await|modifier|view|pure|require|emit)$/.test(part)) return <span key={index} className="text-blue-400">{part}</span>; // Modifiers/Built-ins
+       if (/^(public|private|async|await|modifier|view|pure|require|emit|constructor)$/.test(part)) return <span key={index} className="text-blue-400">{part}</span>; // Modifiers/Built-ins
+       if (/^(console|log|div|span)$/.test(part)) return <span key={index} className="text-cyan-400">{part}</span>; // Built-in/Common
        return <span key={index} className="text-gray-200">{part}</span>;
     });
   };
 
   return (
-    <div className="my-6 rounded border border-green-900/50 bg-black/90 overflow-hidden shadow-lg group font-mono text-sm">
+    <div className="my-6 rounded border border-green-900/50 bg-black/90 overflow-hidden shadow-lg group font-mono text-sm relative">
       <div className="flex justify-between items-center bg-green-900/20 px-4 py-2 border-b border-green-900/30 select-none">
         <span className="text-xs text-green-500 uppercase flex items-center gap-2 font-bold">
            <Terminal size={12} /> {language || 'SCRIPT'}
@@ -47,7 +50,7 @@ const CodeBlock: React.FC<{ code: string; language: string }> = ({ code, languag
           {copied ? 'COPIED' : 'COPY'}
         </button>
       </div>
-      <div className="p-4 overflow-x-auto bg-[#0a0a0a]">
+      <div className="p-4 overflow-x-auto bg-[#0a0a0a] custom-scrollbar">
          <table className="w-full border-collapse text-left">
             <tbody>
               {code.split('\n').map((line, i) => (
@@ -94,43 +97,58 @@ const BlogSection: React.FC = () => {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
+      // Detect Code Block Start
       if (line.trim().startsWith('```')) {
         if (inCode) {
+          // End of code block
           nodes.push(<CodeBlock key={`code-${i}`} code={codeLines.join('\n')} language={lang} />);
           codeLines = [];
           inCode = false;
         } else {
+          // Start of code block
           inCode = true;
-          lang = line.trim().replace('```', '');
+          // Extract language, handle "```javascript" or "``` js"
+          lang = line.trim().replace(/^```/, '').trim();
         }
       } else if (inCode) {
         codeLines.push(line);
       } else {
-        // Standard markdown-ish rendering
+        // Standard markdown rendering
         if (line.startsWith('# ')) {
              nodes.push(<h2 key={i} className="text-2xl font-bold text-green-400 mt-8 mb-4 font-tech border-b border-green-900/50 pb-2">{line.replace(/^#+\s/, '')}</h2>);
         } else if (line.startsWith('## ')) {
              nodes.push(<h3 key={i} className="text-xl font-bold text-green-300 mt-6 mb-3 font-tech">{line.replace(/^#+\s/, '')}</h3>);
+        } else if (line.startsWith('### ')) {
+             nodes.push(<h4 key={i} className="text-lg font-bold text-green-200 mt-4 mb-2 font-tech">{line.replace(/^#+\s/, '')}</h4>);
         } else if (line.startsWith('- ')) {
              nodes.push(<li key={i} className="ml-6 list-disc text-gray-300 my-2 pl-2 marker:text-green-500">{line.substring(2)}</li>);
         } else if (line.trim() === '') {
              nodes.push(<div key={i} className="h-4"></div>);
         } else {
-             // Handle simple **bold**
-             const parts = line.split(/(\*\*.*?\*\*)/g);
+             // Handle **bold** and `inline code`
+             // Split by markdown markers
+             const parts = line.split(/(\*\*.*?\*\*|`.*?`)/g);
+             
              nodes.push(
                 <div key={i} className="text-gray-300 mb-2 leading-relaxed">
-                   {parts.map((part, idx) => 
-                     part.startsWith('**') && part.endsWith('**') 
-                       ? <strong key={idx} className="text-green-200">{part.slice(2, -2)}</strong> 
-                       : part
-                   )}
+                   {parts.map((part, idx) => {
+                     // Check for bold
+                     if (part.startsWith('**') && part.endsWith('**')) {
+                        return <strong key={idx} className="text-green-200 font-bold">{part.slice(2, -2)}</strong>;
+                     }
+                     // Check for inline code
+                     if (part.startsWith('`') && part.endsWith('`')) {
+                        return <code key={idx} className="bg-green-900/30 text-green-300 px-1.5 py-0.5 rounded border border-green-500/20 text-xs font-mono">{part.slice(1, -1)}</code>;
+                     }
+                     // Standard Text
+                     return part;
+                   })}
                 </div>
              );
         }
       }
     }
-    // Handle unclosed code block
+    // Handle unclosed code block at end of file
     if (inCode) {
          nodes.push(<CodeBlock key="code-end" code={codeLines.join('\n')} language={lang} />);
     }
