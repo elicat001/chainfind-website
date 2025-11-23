@@ -1,5 +1,6 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navbar from './components/Navbar';
 import TerminalChat from './components/TerminalChat';
 import MatrixRain from './components/MatrixRain';
@@ -8,15 +9,49 @@ import BlogSection from './components/BlogSection';
 import ProductShowcase from './components/ProductShowcase';
 import { GlitchText, CyberButton, SectionHeader, BootSequence } from './components/HackerUI';
 import { StructuredData } from './components/StructuredData';
-import { Activity, Code, Globe, Lock, Server, ShieldCheck, ChevronDown, Hexagon, Terminal as TerminalIcon, Database, Key, Mail, Bot, Layers, Link } from 'lucide-react';
+import { ShieldCheck, Bot, Link, Layers, Code, Server, ChevronDown, Hexagon, Lock, Activity, Database } from 'lucide-react';
+
+// Register Plugin
+gsap.registerPlugin(ScrollTrigger);
 
 const App: React.FC = () => {
   const [booting, setBooting] = useState(true);
   const [mounted, setMounted] = useState(false);
+  
+  // Refs for ScrollTriggers
+  const heroRef = useRef<HTMLElement>(null);
+  const servicesRef = useRef<HTMLElement>(null);
+  const aboutRef = useRef<HTMLElement>(null);
+  const systemAccessRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Initialize Scroll Animations after boot
+  useEffect(() => {
+    if (!booting && mounted) {
+        const sections = [servicesRef.current, aboutRef.current, systemAccessRef.current];
+        
+        sections.forEach(sec => {
+            if (sec) {
+                gsap.fromTo(sec, 
+                    { opacity: 0, y: 100 },
+                    { 
+                        opacity: 1, 
+                        y: 0, 
+                        duration: 1, 
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: sec,
+                            start: "top 90%",
+                        }
+                    }
+                );
+            }
+        });
+    }
+  }, [booting, mounted]);
 
   if (!mounted) return null;
 
@@ -33,7 +68,7 @@ const App: React.FC = () => {
       <main className="relative z-10">
         
         {/* HERO SECTION */}
-        <section id="hero" className="min-h-screen flex flex-col justify-center items-center text-center relative px-4 overflow-hidden">
+        <section ref={heroRef} id="hero" className="min-h-screen flex flex-col justify-center items-center text-center relative px-4 overflow-hidden">
           <NetworkBackground />
           
           <div className="relative z-20 max-w-5xl mx-auto">
@@ -86,7 +121,7 @@ const App: React.FC = () => {
         </section>
 
         {/* SERVICES SECTION */}
-        <section id="services" className="py-32 relative">
+        <section ref={servicesRef} id="services" className="py-32 relative">
            <div className="container mx-auto px-4 text-center mb-16">
               <SectionHeader title="ACTIVE_PROTOCOLS" subtitle="CORE SERVICES" />
            </div>
@@ -159,7 +194,7 @@ const App: React.FC = () => {
         <ProductShowcase />
 
         {/* ABOUT SECTION */}
-        <section id="about" className="py-32 relative bg-black/80 backdrop-blur-sm">
+        <section ref={aboutRef} id="about" className="py-32 relative bg-black/80 backdrop-blur-sm">
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-16 items-center">
               <div className="space-y-8">
@@ -219,7 +254,7 @@ const App: React.FC = () => {
         <BlogSection />
 
         {/* AI TERMINAL SECTION */}
-        <section id="system_access" className="py-32 bg-black relative border-y border-green-900/50">
+        <section ref={systemAccessRef} id="system_access" className="py-32 bg-black relative border-y border-green-900/50">
           <div className="absolute inset-0 bg-green-900/5 pattern-grid-lg opacity-20"></div>
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center mb-12">
