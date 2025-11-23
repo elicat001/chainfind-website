@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { SectionHeader, CyberButton } from './HackerUI';
 import { Product } from '../types';
-import { Bot, Shield, Cpu, Globe, ExternalLink, Zap, Lock, Activity, Database, Code, Box, GitBranch, TrendingUp } from 'lucide-react';
+import { Bot, Shield, Cpu, Globe, ExternalLink, Zap, Lock, Activity, Database, Code, Box, GitBranch, TrendingUp, BarChart3 } from 'lucide-react';
 
 const MOCK_PRODUCTS: Product[] = [
   {
@@ -91,6 +91,17 @@ const MOCK_PRODUCTS: Product[] = [
     status: 'ONLINE',
     icon: TrendingUp,
     link: 'https://github.com/elicat001/btc_quant_industrial',
+    priceLabel: 'OPEN_SOURCE'
+  },
+  {
+    id: 'PROD_009',
+    name: 'KXIAN_CHART_ENGINE',
+    description: 'Lightweight professional K-Line (Candlestick) visualization library. Optimized for mobile and desktop trading interfaces.',
+    category: 'TOOLS',
+    version: 'v2.0.1',
+    status: 'ONLINE',
+    icon: BarChart3,
+    link: 'https://github.com/elicat001/Kxian',
     priceLabel: 'OPEN_SOURCE'
   }
 ];
