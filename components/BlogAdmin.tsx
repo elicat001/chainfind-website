@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { X, Save, Trash2, Plus, Terminal, Lock, LogOut, RefreshCw, Wifi } from 'lucide-react';
+import { X, Save, Trash2, Plus, Terminal, Lock, LogOut, RefreshCw, Wifi, Sparkles } from 'lucide-react';
 import { BlogPost } from '../types';
 import { blogService } from '../services/blogService';
 import { CyberButton, GlitchText } from './HackerUI';
@@ -36,7 +35,7 @@ export const BlogAdmin: React.FC<BlogAdminProps> = ({ isOpen, onClose, onUpdate 
         await action();
     } catch (err) {
         console.error(err);
-        alert("SYSTEM ERROR: CONNECTION REFUSED");
+        alert("SYSTEM ERROR: OPERATION FAILED");
     } finally {
         setLoading(false);
         setLoadingText('');
@@ -117,6 +116,19 @@ export const BlogAdmin: React.FC<BlogAdminProps> = ({ isOpen, onClose, onUpdate 
         setEditingPost(null);
     });
   };
+
+  // NEW: Handle Manual AI Generation
+  const handleAutoGenerate = () => {
+      if (API_CONFIG.USE_MOCK_API) {
+          alert("AUTO-GEN FEATURE REQUIRES LIVE BACKEND CONNECTION. DISABLE MOCK MODE IN CONFIG.");
+          return;
+      }
+      simulateLoading('INITIALIZING AI WRITER PROTOCOL...', async () => {
+          await blogService.triggerAutoGeneration();
+          await blogService.getAllPosts().then(setPosts);
+          onUpdate();
+      });
+  }
 
   if (!isOpen) return null;
 
@@ -233,6 +245,16 @@ export const BlogAdmin: React.FC<BlogAdminProps> = ({ isOpen, onClose, onUpdate 
                         <span className="text-xs text-green-500 bg-green-900/20 px-2 py-1 rounded border border-green-500/20">{posts.length} RECORDS</span>
                     </div>
                     <div className="flex gap-4">
+                         {!API_CONFIG.USE_MOCK_API && (
+                            <button 
+                                onClick={handleAutoGenerate}
+                                className="flex items-center gap-2 text-purple-400 hover:text-purple-300 text-xs font-mono border border-purple-500/50 px-3 py-2 rounded hover:bg-purple-900/20 transition-all"
+                                title="FORCE TRIGGER AI WRITER"
+                            >
+                                <Sparkles size={14} /> AUTO_GENERATE_NOW
+                            </button>
+                         )}
+                        
                         <button onClick={() => setIsAuthenticated(false)} className="flex items-center gap-2 text-gray-500 hover:text-red-400 text-xs font-mono">
                             <LogOut size={14} /> LOGOUT
                         </button>

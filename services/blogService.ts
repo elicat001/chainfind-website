@@ -1,4 +1,3 @@
-
 import { BlogPost } from '../types';
 import { API_CONFIG } from '../config';
 
@@ -108,9 +107,14 @@ class BlogService {
       }
     } else {
       // Real Backend Call
-      const response = await fetch(`${API_CONFIG.API_BASE_URL}/posts`);
-      if (!response.ok) throw new Error('Network response was not ok');
-      return await response.json();
+      try {
+        const response = await fetch(`${API_CONFIG.API_BASE_URL}/posts`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        return await response.json();
+      } catch (error) {
+        console.warn('Backend unavailable, falling back to mock data');
+        return DEFAULT_POSTS;
+      }
     }
   }
 
@@ -128,9 +132,8 @@ class BlogService {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
     } else {
       // Real Backend Call
-      const method = post.id ? 'PUT' : 'POST'; // Assuming logic for update/create
       const response = await fetch(`${API_CONFIG.API_BASE_URL}/posts`, {
-        method: 'POST', // Or PUT based on ID existence in real DB
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(post)
       });
@@ -151,6 +154,18 @@ class BlogService {
       });
       if (!response.ok) throw new Error('Failed to delete post');
     }
+  }
+
+  // --- NEW: Trigger AI Generation Manually ---
+  async triggerAutoGeneration(): Promise<void> {
+    if (API_CONFIG.USE_MOCK_API) {
+      alert("AUTO-GEN REQUIRES REAL BACKEND (DISABLE MOCK MODE)");
+      return;
+    }
+    const response = await fetch(`${API_CONFIG.API_BASE_URL}/cron/trigger`, {
+      method: 'POST'
+    });
+    if (!response.ok) throw new Error('Failed to trigger auto-gen');
   }
 
   // Private helper for mock mode to avoid circular async calls
