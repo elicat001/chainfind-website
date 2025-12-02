@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
@@ -10,29 +9,60 @@ const NetworkGlobe: React.FC = () => {
 
     // --- SCENE SETUP ---
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, mountRef.current.clientWidth / mountRef.current.clientHeight, 0.1, 1000);
-    camera.position.z = 18;
+    // Deep cosmic fog for depth
+    scene.fog = new THREE.FogExp2(0x020205, 0.02);
+
+    const camera = new THREE.PerspectiveCamera(45, mountRef.current.clientWidth / mountRef.current.clientHeight, 0.1, 2000);
+    camera.position.z = 22;
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     mountRef.current.appendChild(renderer.domElement);
 
-    const group = new THREE.Group();
-    scene.add(group);
+    const mainGroup = new THREE.Group();
+    scene.add(mainGroup);
 
-    // --- GLOBE MESH (Wireframe) ---
-    const geometry = new THREE.IcosahedronGeometry(6, 2); // Radius 6, Detail 2
+    // --- 1. PARALLEL UNIVERSES (Ghost Globes) ---
+    // Dimension Alpha (Cyan Echo)
+    const geometryEcho1 = new THREE.IcosahedronGeometry(7, 1);
+    const materialEcho1 = new THREE.MeshBasicMaterial({
+        color: 0x00ffff,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.03,
+        blending: THREE.AdditiveBlending,
+    });
+    const echo1 = new THREE.Mesh(geometryEcho1, materialEcho1);
+    mainGroup.add(echo1);
+
+    // Dimension Beta (Purple Echo)
+    const geometryEcho2 = new THREE.IcosahedronGeometry(7.8, 1);
+    const materialEcho2 = new THREE.MeshBasicMaterial({
+        color: 0xff00ff,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.02,
+        blending: THREE.AdditiveBlending,
+    });
+    const echo2 = new THREE.Mesh(geometryEcho2, materialEcho2);
+    mainGroup.add(echo2);
+
+    // --- 2. MAIN CORE GLOBE (Green) ---
+    const globeGroup = new THREE.Group();
+    mainGroup.add(globeGroup);
+
+    const geometry = new THREE.IcosahedronGeometry(6, 2);
     const material = new THREE.MeshBasicMaterial({
       color: 0x003300,
       wireframe: true,
       transparent: true,
-      opacity: 0.15,
+      opacity: 0.1,
     });
     const globe = new THREE.Mesh(geometry, material);
-    group.add(globe);
+    globeGroup.add(globe);
 
-    // --- NETWORK POINTS (Nodes) ---
+    // --- 3. NETWORK NODES & CONNECTIONS ---
     const particleCount = 200;
     const particleGeo = new THREE.BufferGeometry();
     const particlePos = new Float32Array(particleCount * 3);
@@ -66,10 +96,8 @@ const NetworkGlobe: React.FC = () => {
         blending: THREE.AdditiveBlending
     });
     const particles = new THREE.Points(particleGeo, particleMat);
-    group.add(particles);
+    globeGroup.add(particles);
 
-    // --- CONNECTIONS (Lines) ---
-    // Create random connections between nearby points
     const lineMat = new THREE.LineBasicMaterial({
         color: 0x00ff00,
         transparent: true,
@@ -79,16 +107,14 @@ const NetworkGlobe: React.FC = () => {
     const lineGeo = new THREE.BufferGeometry();
     const linePositions: number[] = [];
 
-    // Simple distance check to connect nodes
     for (let i = 0; i < globePoints.length; i++) {
         const p1 = globePoints[i];
-        // Connect to 2 nearest neighbors
         let connections = 0;
         for (let j = i + 1; j < globePoints.length; j++) {
             if (connections >= 2) break;
             const p2 = globePoints[j];
             const dist = p1.distanceTo(p2);
-            if (dist < 2.5) { // Threshold for connection
+            if (dist < 2.5) {
                 linePositions.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
                 connections++;
             }
@@ -96,11 +122,10 @@ const NetworkGlobe: React.FC = () => {
     }
     lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
     const lines = new THREE.LineSegments(lineGeo, lineMat);
-    group.add(lines);
+    globeGroup.add(lines);
 
-    // --- ATMOSPHERE GLOW (Fake Volumetric) ---
+    // --- 4. ATMOSPHERE GLOW (Cyberpunk) ---
     const glowGeo = new THREE.SphereGeometry(6, 32, 32);
-    // Custom shader material for glow
     const vertexShader = `
       varying vec3 vNormal;
       void main() {
@@ -115,7 +140,6 @@ const NetworkGlobe: React.FC = () => {
         gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0) * intensity;
       }
     `;
-    
     const glowMat = new THREE.ShaderMaterial({
         uniforms: {},
         vertexShader,
@@ -125,8 +149,46 @@ const NetworkGlobe: React.FC = () => {
         transparent: true
     });
     const glowMesh = new THREE.Mesh(glowGeo, glowMat);
-    glowMesh.scale.set(1.1, 1.1, 1.1); // Slightly larger
-    group.add(glowMesh);
+    glowMesh.scale.set(1.1, 1.1, 1.1);
+    globeGroup.add(glowMesh);
+
+
+    // --- 5. THE UNIVERSE (Starfield) ---
+    const starGeo = new THREE.BufferGeometry();
+    const starCount = 1500;
+    const starPos = new Float32Array(starCount * 3);
+    for(let i=0; i<starCount; i++) {
+        // Distribute stars in a sphere from radius 20 to 80
+        const r = 20 + Math.random() * 60;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        starPos[i*3] = r * Math.sin(phi) * Math.cos(theta);
+        starPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+        starPos[i*3+2] = r * Math.cos(phi);
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    const starMat = new THREE.PointsMaterial({
+        color: 0x8899aa, // Bluish white
+        size: 0.1,
+        transparent: true,
+        opacity: 0.4,
+    });
+    const starField = new THREE.Points(starGeo, starMat);
+    mainGroup.add(starField);
+
+
+    // --- 6. DIMENSIONAL RINGS ---
+    const ringGeo = new THREE.TorusGeometry(14, 0.02, 16, 100);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending });
+    
+    const ring1 = new THREE.Mesh(ringGeo, ringMat);
+    ring1.rotation.x = Math.PI / 2;
+    mainGroup.add(ring1);
+
+    const ring2 = new THREE.Mesh(ringGeo, ringMat);
+    ring2.rotation.y = Math.PI / 2;
+    ring2.scale.set(0.8, 0.8, 0.8);
+    mainGroup.add(ring2);
 
 
     // --- ANIMATION & INTERACTION ---
@@ -146,16 +208,32 @@ const NetworkGlobe: React.FC = () => {
     const animate = () => {
         requestAnimationFrame(animate);
 
-        // Constant spin
-        group.rotation.y += 0.002;
+        // 1. Core Spin
+        globeGroup.rotation.y += 0.002;
 
-        // Mouse interaction smoothing
+        // 2. Parallel Universe Spin (Different axes/speeds)
+        echo1.rotation.y -= 0.001;
+        echo1.rotation.z += 0.0005;
+
+        echo2.rotation.y += 0.0015;
+        echo2.rotation.x -= 0.0005;
+
+        // 3. Ring Rotation (Gyroscopic)
+        ring1.rotation.z += 0.001;
+        ring1.rotation.x += 0.0005;
+        
+        ring2.rotation.z -= 0.001;
+        ring2.rotation.y += 0.0005;
+
+        // 4. Universe Drift
+        starField.rotation.y -= 0.0002;
+
+        // 5. Mouse Interaction
         targetRotationY += (mouseX - targetRotationY) * 0.05;
         targetRotationX += (mouseY - targetRotationX) * 0.05;
 
-        // Apply mouse influence
-        group.rotation.y += targetRotationY;
-        group.rotation.x += targetRotationX;
+        mainGroup.rotation.y += targetRotationY;
+        mainGroup.rotation.x += targetRotationX;
 
         renderer.render(scene, camera);
     };
@@ -173,14 +251,10 @@ const NetworkGlobe: React.FC = () => {
         window.removeEventListener('mousemove', handleMouseMove);
         window.removeEventListener('resize', handleResize);
         if (mountRef.current) mountRef.current.removeChild(renderer.domElement);
-        geometry.dispose();
-        material.dispose();
-        particleGeo.dispose();
-        particleMat.dispose();
-        lineGeo.dispose();
-        lineMat.dispose();
-        glowGeo.dispose();
-        glowMat.dispose();
+        // Disposables
+        [geometry, material, particleGeo, particleMat, lineGeo, lineMat, 
+         geometryEcho1, materialEcho1, geometryEcho2, materialEcho2, 
+         starGeo, starMat, ringGeo, ringMat, glowGeo, glowMat].forEach(r => r.dispose());
     };
   }, []);
 

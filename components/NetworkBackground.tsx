@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import gsap from 'gsap';
@@ -54,6 +53,7 @@ const NetworkBackground: React.FC = () => {
       blackHole: new Float32Array(particleCount * 3),
       solar: new Float32Array(particleCount * 3),
       constellation: new Float32Array(particleCount * 3),
+      hypercube: new Float32Array(particleCount * 3),
     };
 
     const color = new THREE.Color();
@@ -147,6 +147,45 @@ const NetworkBackground: React.FC = () => {
         }
     }
 
+    // 5. HYPERCUBE (Tesseract Projection approximation)
+    const cubeSize = 80;
+    for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        // Outer cube
+        if (i < particleCount / 2) {
+            shapes.hypercube[i3] = (Math.random() > 0.5 ? 1 : -1) * cubeSize;
+            shapes.hypercube[i3+1] = (Math.random() - 0.5) * cubeSize * 2;
+            shapes.hypercube[i3+2] = (Math.random() - 0.5) * cubeSize * 2;
+            
+            // Randomly flip axes to cover all faces
+            if (Math.random() > 0.66) {
+                 const temp = shapes.hypercube[i3];
+                 shapes.hypercube[i3] = shapes.hypercube[i3+1];
+                 shapes.hypercube[i3+1] = temp;
+            } else if (Math.random() > 0.33) {
+                 const temp = shapes.hypercube[i3];
+                 shapes.hypercube[i3] = shapes.hypercube[i3+2];
+                 shapes.hypercube[i3+2] = temp;
+            }
+        } else {
+            // Inner cube
+            const innerSize = cubeSize * 0.5;
+            shapes.hypercube[i3] = (Math.random() > 0.5 ? 1 : -1) * innerSize;
+            shapes.hypercube[i3+1] = (Math.random() - 0.5) * innerSize * 2;
+            shapes.hypercube[i3+2] = (Math.random() - 0.5) * innerSize * 2;
+            
+             if (Math.random() > 0.66) {
+                 const temp = shapes.hypercube[i3];
+                 shapes.hypercube[i3] = shapes.hypercube[i3+1];
+                 shapes.hypercube[i3+1] = temp;
+            } else if (Math.random() > 0.33) {
+                 const temp = shapes.hypercube[i3];
+                 shapes.hypercube[i3] = shapes.hypercube[i3+2];
+                 shapes.hypercube[i3+2] = temp;
+            }
+        }
+    }
+
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
@@ -205,7 +244,7 @@ const NetworkBackground: React.FC = () => {
 
 
     // --- ANIMATION CONTROLLER ---
-    const phases = ['cosmos', 'blackHole', 'solar', 'constellation'];
+    const phases = ['cosmos', 'blackHole', 'solar', 'constellation', 'hypercube'];
     let currentPhaseIndex = 0;
 
     const animateShape = (target: string) => {
@@ -238,6 +277,7 @@ const NetworkBackground: React.FC = () => {
         // Subtle color shift based on phase
         const c = new THREE.Color();
         if(phases[currentPhaseIndex] === 'blackHole') c.setHex(0xffaa00); // Orange tint
+        else if(phases[currentPhaseIndex] === 'hypercube') c.setHex(0x00ffff); // Cyan tint
         else c.setHex(0x00ff88); // Default Green
         
         gsap.to(color, {
