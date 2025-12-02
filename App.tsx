@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -5,6 +6,7 @@ import Navbar from './components/Navbar';
 import TerminalChat from './components/TerminalChat';
 import MatrixRain from './components/MatrixRain';
 import NetworkBackground from './components/NetworkBackground';
+import NetworkGlobe from './components/NetworkGlobe';
 import BlogSection from './components/BlogSection';
 import ProductShowcase from './components/ProductShowcase';
 import { GlitchText, CyberButton, SectionHeader, BootSequence } from './components/HackerUI';
@@ -69,7 +71,9 @@ const App: React.FC = () => {
         
         {/* HERO SECTION */}
         <section ref={heroRef} id="hero" className="min-h-screen flex flex-col justify-center items-center text-center relative px-4 overflow-hidden">
+          {/* Global Background still exists, but we add the Globe specifically to Hero */}
           <NetworkBackground />
+          <NetworkGlobe />
           
           <div className="relative z-20 max-w-5xl mx-auto">
             <div className="mb-6 flex justify-center">

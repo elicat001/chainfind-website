@@ -35,62 +35,91 @@ const TerminalChat: React.FC = () => {
       setHistory(prev => [...prev, successMsg]);
   };
 
-  const handleCommand = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isProcessing) return;
+  // --- COMMAND HANDLERS ---
 
-    const userMsg: ChatMessage = {
-      id: Date.now().toString(),
-      role: MessageRole.USER,
-      text: input
-    };
+  const executeHelp = () => {
+    setHistory(prev => [...prev, {
+        id: Date.now().toString(),
+        role: MessageRole.SYSTEM,
+        text: `AVAILABLE COMMANDS:\n\n/help    - Show this list\n/signal  - Open encrypted contact form\n/status  - Check system integrity\n/clear   - Clear terminal history`
+    }]);
+    setIsProcessing(false);
+  };
 
-    setHistory(prev => [...prev, userMsg]);
-    setInput('');
-    setIsProcessing(true);
+  const executeClear = () => {
+    setHistory([{ 
+        id: Date.now().toString(), 
+        role: MessageRole.SYSTEM, 
+        text: 'TERMINAL CLEARED.' 
+    }]);
+    setIsProcessing(false);
+  };
 
-    const command = userMsg.text.trim().toLowerCase();
+  const executeStatus = () => {
+    const loadingId = Date.now().toString();
+    setHistory(prev => [...prev, {
+        id: loadingId,
+        role: MessageRole.SYSTEM,
+        text: 'RUNNING DIAGNOSTICS...',
+        isTyping: true
+    }]);
 
-    // --- COMMAND INTERCEPTION ---
-    if (command === '/help') {
-        setHistory(prev => [...prev, {
-            id: Date.now().toString(),
-            role: MessageRole.SYSTEM,
-            text: `AVAILABLE COMMANDS:\n\n/help    - Show this list\n/signal  - Open encrypted contact form\n/clear   - Clear terminal history\n/status  - Check system integrity`
-        }]);
+    setTimeout(() => {
+        setHistory(prev => prev.map(msg => 
+            msg.id === loadingId 
+            ? {
+                ...msg,
+                isTyping: false,
+                text: `SYSTEM INTEGRITY CHECK:
+-------------------------
+CORE_KERNEL:   [OK] v2.5.1
+ENCRYPTION:    AES-256 [ACTIVE]
+FIREWALL:      ENABLED
+LATENCY:       <20ms
+AI_ENGINE:     ONLINE
+DATABASE:      CONNECTED
+-------------------------
+ALL SYSTEMS OPERATIONAL.`
+            }
+            : msg
+        ));
         setIsProcessing(false);
-        return;
-    }
+    }, 1500);
+  };
 
-    if (command === '/clear') {
-        setHistory([{ 
-            id: Date.now().toString(), 
-            role: MessageRole.SYSTEM, 
-            text: 'TERMINAL CLEARED.' 
-        }]);
+  const executeSignal = () => {
+    const loadingId = Date.now().toString();
+    
+    // 1. Show Loading State
+    setHistory(prev => [...prev, {
+        id: loadingId,
+        role: MessageRole.SYSTEM,
+        text: 'INITIALIZING SECURE HANDSHAKE... [VERIFYING KEYS]',
+        isTyping: true // Shows cursor blink
+    }]);
+
+    // 2. Delay to simulate connection
+    setTimeout(() => {
+        setHistory(prev => prev.map(msg => 
+            msg.id === loadingId 
+            ? {
+                ...msg,
+                isTyping: false,
+                isCustomUI: true, // Swaps text for Form UI
+                text: 'ACCESS GRANTED' // Fallback text
+            }
+            : msg
+        ));
         setIsProcessing(false);
-        return;
-    }
+    }, 1800);
+  };
 
-    if (command === '/signal' || command === '/contact') {
-        // Insert the Contact Form as a specific message type or just render it via a custom text marker
-        setHistory(prev => [...prev, {
-            id: Date.now().toString(),
-            role: MessageRole.SYSTEM,
-            text: 'OPENING SECURE CHANNEL...',
-            isCustomUI: true // Custom flag we will handle in render
-        }]);
-        setIsProcessing(false);
-        return;
-    }
-    // ---------------------------
-
-    // Default: Send to AI
+  const executeAIQuery = async (query: string) => {
     const responseId = (Date.now() + 1).toString();
     setHistory(prev => [...prev, { id: responseId, role: MessageRole.AI, text: '', isTyping: true }]);
 
     try {
-      const stream = await sendMessageToChainCore(userMsg.text);
+      const stream = await sendMessageToChainCore(query);
       
       let fullText = '';
       
@@ -127,6 +156,58 @@ const TerminalChat: React.FC = () => {
     }
   };
 
+  // --- INPUT DISPATCHER ---
+
+  const parseAndExecute = (inputText: string) => {
+    const command = inputText.trim().split(/\s+/)[0].toLowerCase();
+
+    switch (command) {
+        case '/help':
+            executeHelp();
+            break;
+        case '/clear':
+            executeClear();
+            break;
+        case '/status':
+            executeStatus();
+            break;
+        case '/signal':
+        case '/contact':
+            executeSignal();
+            break;
+        default:
+            // If it starts with / but isn't matched, show error. Otherwise, send to AI.
+            if (inputText.trim().startsWith('/')) {
+                setHistory(prev => [...prev, {
+                    id: Date.now().toString(),
+                    role: MessageRole.SYSTEM,
+                    text: `UNKNOWN COMMAND: ${command}. Type /help for list.`
+                }]);
+                setIsProcessing(false);
+            } else {
+                executeAIQuery(inputText);
+            }
+            break;
+    }
+  };
+
+  const handleInputSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isProcessing) return;
+
+    const userMsg: ChatMessage = {
+      id: Date.now().toString(),
+      role: MessageRole.USER,
+      text: input
+    };
+
+    setHistory(prev => [...prev, userMsg]);
+    setInput('');
+    setIsProcessing(true);
+
+    parseAndExecute(userMsg.text);
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto my-12 font-mono border border-green-500/50 bg-black/90 backdrop-blur-md rounded-lg overflow-hidden shadow-[0_0_20px_rgba(0,255,0,0.15)] z-10 relative">
       {/* Terminal Header */}
@@ -149,7 +230,7 @@ const TerminalChat: React.FC = () => {
             
             {msg.isCustomUI ? (
                 // RENDER CONTACT FORM UI
-                <div className="inline-block w-full max-w-2xl p-6 bg-green-900/10 border border-green-500/50 rounded relative overflow-hidden">
+                <div className="inline-block w-full max-w-2xl p-6 bg-green-900/10 border border-green-500/50 rounded relative overflow-hidden animate-in fade-in zoom-in duration-300">
                     <div className="absolute top-0 left-0 w-full h-1 bg-green-500 animate-scanline"></div>
                     <h3 className="text-green-400 font-bold text-lg mb-4 flex items-center gap-2">
                         <Globe size={18} /> SECURE_TRANSMISSION_PROTOCOL
@@ -202,7 +283,7 @@ const TerminalChat: React.FC = () => {
       </div>
 
       {/* Input Area */}
-      <form onSubmit={handleCommand} className="border-t border-green-500/30 p-2 bg-black/50 flex items-center gap-2">
+      <form onSubmit={handleInputSubmit} className="border-t border-green-500/30 p-2 bg-black/50 flex items-center gap-2">
         <span className="text-green-500 font-bold pl-2">{'>'}</span>
         <input
           type="text"
