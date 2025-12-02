@@ -75,30 +75,44 @@ const App: React.FC = () => {
           <NetworkBackground />
           <NetworkGlobe />
           
+          {/* Contrast Overlay: Darkens the center slightly to make text pop against 3D elements */}
+          <div className="absolute inset-0 bg-radial-gradient from-transparent via-black/30 to-black/80 pointer-events-none z-10"></div>
+
           <div className="relative z-20 max-w-5xl mx-auto">
-            <div className="mb-6 flex justify-center">
-               <div className="px-4 py-1 border border-green-500/30 bg-black/50 backdrop-blur text-xs tracking-[0.3em] animate-pulse-fast flex items-center gap-2 clip-corner-1">
-                  <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+            <div className="mb-8 flex justify-center">
+               <div className="px-6 py-2 border border-green-500/50 bg-black/80 backdrop-blur-md text-sm tracking-[0.3em] font-bold text-green-400 animate-pulse-fast flex items-center gap-3 shadow-[0_0_15px_rgba(0,255,0,0.2)] clip-corner-1">
+                  <span className="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_5px_#0f0]"></span>
                   SYSTEM_STATUS: OPTIMIZED
                </div>
             </div>
             
-            <h1 className="text-6xl md:text-8xl font-bold font-tech mb-6 text-white tracking-tighter leading-none">
+            <h1 className="text-7xl md:text-9xl font-bold font-tech mb-8 text-white tracking-tighter leading-none drop-shadow-[0_0_25px_rgba(0,255,0,0.3)]">
               <GlitchText text="CHAINFIND" />
             </h1>
             
-            <p className="text-xl md:text-2xl text-green-400 font-mono mb-2 tracking-widest">
-              <span className="opacity-50">&lt;</span> SECURITY / AI / WEB3 <span className="opacity-50">/&gt;</span>
-            </p>
-            <p className="max-w-2xl mx-auto text-gray-400 mb-12 text-sm md:text-base border-l-2 border-green-500/30 pl-4 text-left">
-              "We engineer the future. From <strong>AI Agents</strong> and <strong>Blockchain Protocols</strong> to elite <strong>Cybersecurity</strong>. We build the invisible walls that protect your data and the intelligent engines that power your growth."
-            </p>
+            {/* High Contrast Subtitle */}
+            <div className="mb-10 inline-flex items-center justify-center bg-black/70 backdrop-blur border-y border-green-500/30 py-3 px-8">
+                <p className="text-2xl md:text-3xl text-green-300 font-mono font-bold tracking-[0.15em] drop-shadow-sm">
+                <span className="text-green-700 opacity-80">&lt;</span> SECURITY / AI / WEB3 <span className="text-green-700 opacity-80">/&gt;</span>
+                </p>
+            </div>
 
-            <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
+            {/* High Contrast Description Box */}
+            <div className="max-w-3xl mx-auto mb-14 bg-black/90 border border-green-500/30 p-8 md:p-10 relative overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+                {/* Accent Line */}
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-green-400 to-green-900 shadow-[0_0_10px_#00ff00]"></div>
+                
+                <p className="text-gray-100 text-lg md:text-xl leading-relaxed font-mono text-left font-medium">
+                "We engineer the future. From <span className="text-green-400 font-bold bg-green-900/20 px-1 border-b border-green-500/50">AI Agents</span> and <span className="text-green-400 font-bold bg-green-900/20 px-1 border-b border-green-500/50">Blockchain Protocols</span> to elite <span className="text-green-400 font-bold bg-green-900/20 px-1 border-b border-green-500/50">Cybersecurity</span>. We build the invisible walls that protect your data and the intelligent engines that power your growth."
+                </p>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-8 justify-center items-center">
               <CyberButton 
                 variant="primary"
                 onClick={() => document.getElementById('system_access')?.scrollIntoView({behavior: 'smooth'})}
                 aria-label="Initialize Core System"
+                className="text-lg px-10 py-4 shadow-[0_0_20px_rgba(0,255,0,0.4)]"
               >
                 INITIALIZE_CORE
               </CyberButton>
@@ -106,22 +120,23 @@ const App: React.FC = () => {
                 variant="secondary"
                 onClick={() => document.getElementById('products')?.scrollIntoView({behavior: 'smooth'})}
                 aria-label="Browse Services"
+                className="text-lg px-10 py-4"
               >
                 BROWSE_ARSENAL
               </CyberButton>
             </div>
           </div>
           
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-green-500/50 cursor-pointer"
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-green-500/80 cursor-pointer drop-shadow-[0_0_5px_#0f0]"
                onClick={() => document.getElementById('services')?.scrollIntoView({behavior: 'smooth'})}
                aria-label="Scroll Down"
           >
-             <ChevronDown size={32} />
+             <ChevronDown size={40} />
           </div>
 
           {/* Decorative Corner Elements */}
-          <div className="absolute top-32 left-10 w-32 h-32 border-l-2 border-t-2 border-green-500/20 hidden md:block"></div>
-          <div className="absolute bottom-20 right-10 w-32 h-32 border-r-2 border-b-2 border-green-500/20 hidden md:block"></div>
+          <div className="absolute top-32 left-10 w-32 h-32 border-l-2 border-t-2 border-green-500/40 hidden md:block"></div>
+          <div className="absolute bottom-20 right-10 w-32 h-32 border-r-2 border-b-2 border-green-500/40 hidden md:block"></div>
         </section>
 
         {/* SERVICES SECTION */}

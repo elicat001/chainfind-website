@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -83,7 +84,7 @@ export const CyberButton: React.FC<CyberButtonProps> = ({ children, variant = 'p
   const baseStyles = "relative px-8 py-3 font-bold font-mono uppercase tracking-wider transition-all duration-300 clip-corner-1 group overflow-hidden";
   const variants = {
     primary: "bg-green-600 text-black hover:bg-green-500 hover:shadow-[0_0_20px_rgba(0,255,0,0.6)]",
-    secondary: "bg-transparent border border-green-500/50 text-green-500 hover:bg-green-900/20 hover:border-green-400 hover:text-green-300"
+    secondary: "bg-black/70 border border-green-500/50 text-green-400 hover:bg-green-900/40 hover:border-green-400 hover:text-green-200 backdrop-blur-sm"
   };
 
   return (
