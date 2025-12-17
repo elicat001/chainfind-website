@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -62,6 +62,50 @@ export const GlitchText: React.FC<GlitchTextProps> = ({ text, as: Component = 'd
     <Component ref={elementRef} className={`font-mono ${className}`}>
       {text}
     </Component>
+  );
+};
+
+export const DecryptHover: React.FC<{ text: string; className?: string }> = ({ text, className = '' }) => {
+  const [display, setDisplay] = useState(text);
+  const intervalRef = useRef<any>(null);
+  const chars = "01XYZ#@!&";
+  const originalText = text;
+
+  const handleMouseEnter = () => {
+    clearInterval(intervalRef.current);
+    let iteration = 0;
+    
+    intervalRef.current = setInterval(() => {
+        setDisplay(prev => 
+            originalText.split("").map((letter, index) => {
+                if (index < iteration) {
+                    return originalText[index];
+                }
+                return chars[Math.floor(Math.random() * chars.length)];
+            }).join("")
+        );
+        
+        if (iteration >= originalText.length) {
+            clearInterval(intervalRef.current);
+        }
+        
+        iteration += 1 / 2; 
+    }, 30);
+  };
+
+  const handleMouseLeave = () => {
+      clearInterval(intervalRef.current);
+      setDisplay(originalText);
+  };
+
+  return (
+    <span 
+      onMouseEnter={handleMouseEnter} 
+      onMouseLeave={handleMouseLeave}
+      className={`cursor-crosshair ${className}`}
+    >
+      {display}
+    </span>
   );
 };
 

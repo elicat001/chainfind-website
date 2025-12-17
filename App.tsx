@@ -9,8 +9,9 @@ import NetworkBackground from './components/NetworkBackground';
 import NetworkGlobe from './components/NetworkGlobe';
 import BlogSection from './components/BlogSection';
 import ProductShowcase from './components/ProductShowcase';
-import { GlitchText, CyberButton, SectionHeader, BootSequence } from './components/HackerUI';
+import { GlitchText, CyberButton, SectionHeader, BootSequence, DecryptHover } from './components/HackerUI';
 import { StructuredData } from './components/StructuredData';
+import HackerCursor from './components/HackerCursor';
 import { ShieldCheck, Bot, Link, Layers, Code, Server, ChevronDown, Hexagon, Lock, Activity, Database } from 'lucide-react';
 
 // Register Plugin
@@ -62,9 +63,10 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-dark-bg text-green-400 font-mono selection:bg-green-500 selection:text-black relative overflow-hidden">
+    <div className="min-h-screen bg-dark-bg text-green-400 font-mono selection:bg-green-500 selection:text-black relative overflow-hidden cursor-none">
       <StructuredData />
       <MatrixRain />
+      <HackerCursor />
       <Navbar />
 
       <main className="relative z-10">
@@ -184,7 +186,7 @@ const App: React.FC = () => {
                  code: 'PING 127.0.0.1'
                },
              ].map((service, idx) => (
-               <article key={idx} className="group relative bg-black border border-green-900 p-8 transition-all duration-300 hover:border-green-500 hover:-translate-y-2 overflow-hidden">
+               <article key={idx} className="group relative bg-black border border-green-900 p-8 transition-all duration-300 hover:border-green-500 hover:-translate-y-2 overflow-hidden hover:shadow-[0_0_20px_rgba(0,255,0,0.15)]">
                  {/* Hover Background Effect */}
                  <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-0 group-hover:opacity-10 transition-opacity"></div>
                  
@@ -193,9 +195,9 @@ const App: React.FC = () => {
                      {service.icon}
                    </div>
                    <h3 className="text-2xl font-tech font-bold text-white mb-4 group-hover:text-green-300">{service.title}</h3>
-                   <p className="text-gray-500 group-hover:text-gray-300 mb-6 leading-relaxed text-sm">
-                     {service.desc}
-                   </p>
+                   <div className="text-gray-500 group-hover:text-gray-300 mb-6 leading-relaxed text-sm h-20">
+                     <DecryptHover text={service.desc} />
+                   </div>
                    <div className="border-t border-green-900 pt-4 flex justify-between items-center text-xs font-mono text-green-700 group-hover:text-green-500">
                      <span>STATUS: ACTIVE</span>
                      <code>{service.code}</code>
@@ -219,7 +221,7 @@ const App: React.FC = () => {
               <div className="space-y-8">
                  <SectionHeader title="IDENTITY_MATRIX" subtitle="ABOUT CHAINFIND" />
                  
-                 <div className="bg-gray-900/50 p-6 border-l-4 border-green-500 clip-corner-2 relative group">
+                 <div className="bg-gray-900/50 p-6 border-l-4 border-green-500 clip-corner-2 relative group hover:bg-gray-900/70 transition-colors">
                    <div className="absolute -inset-1 bg-green-500/10 blur transition-opacity opacity-0 group-hover:opacity-100"></div>
                    <p className="text-gray-300 leading-relaxed font-mono relative z-10">
                      <strong>Chainfind</strong> is an elite collective of technologists operating at the intersection of <strong>Artificial Intelligence</strong>, <strong>Blockchain</strong>, and <strong>Network Security</strong>. We don't just build software; we architect decentralized ecosystems and intelligent agents that operate securely in the shadows of the digital infrastructure.
@@ -233,7 +235,7 @@ const App: React.FC = () => {
                       { label: "LATENCY", val: "<12ms" },
                       { label: "THREATS", val: "NEUTRALIZED" }
                     ].map((stat, i) => (
-                      <div key={i} className="border border-green-500/20 p-4 bg-black/40 hover:bg-green-900/20 transition-colors">
+                      <div key={i} className="border border-green-500/20 p-4 bg-black/40 hover:bg-green-900/20 transition-colors hover:border-green-500/50">
                         <div className="text-xs text-gray-500 mb-1">{stat.label}</div>
                         <div className="text-xl text-green-400 font-bold font-tech">{stat.val}</div>
                       </div>
@@ -242,8 +244,8 @@ const App: React.FC = () => {
               </div>
               
               <div className="relative">
-                 <div className="absolute inset-0 bg-green-500/20 blur-3xl rounded-full opacity-20"></div>
-                 <div className="border border-green-500/30 bg-black/90 p-1 relative">
+                 <div className="absolute inset-0 bg-green-500/20 blur-3xl rounded-full opacity-20 animate-pulse"></div>
+                 <div className="border border-green-500/30 bg-black/90 p-1 relative hover:scale-[1.01] transition-transform duration-500">
                    {/* Fake Terminal Window */}
                    <div className="bg-gray-900 p-2 flex gap-2 border-b border-gray-800">
                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
@@ -261,7 +263,7 @@ const App: React.FC = () => {
                    
                    {/* Decorative Grid */}
                    <div className="absolute -bottom-6 -right-6 text-green-800/40">
-                     <Hexagon size={120} strokeWidth={1} />
+                     <Hexagon size={120} strokeWidth={1} className="animate-spin-slow" />
                    </div>
                  </div>
               </div>
@@ -304,8 +306,8 @@ const App: React.FC = () => {
              <div className="flex flex-col md:flex-row justify-between items-center text-xs text-gray-600 font-mono">
                <p>&copy; {new Date().getFullYear()} CHAINFIND SYSTEMS. ELITE NETWORK SECURITY & SOFTWARE DEVELOPMENT.</p>
                <div className="flex gap-4 mt-4 md:mt-0">
-                 <span className="hover:text-green-500 cursor-pointer">PRIVACY_PROTOCOL</span>
-                 <span className="hover:text-green-500 cursor-pointer">TERMS_OF_ENGAGEMENT</span>
+                 <span className="hover:text-green-500 cursor-pointer transition-colors">PRIVACY_PROTOCOL</span>
+                 <span className="hover:text-green-500 cursor-pointer transition-colors">TERMS_OF_ENGAGEMENT</span>
                </div>
              </div>
              <p className="mt-4 text-[10px] text-green-900">UNAUTHORIZED ACCESS IS A FEDERAL OFFENSE UNDER THE COMPUTER FRAUD AND ABUSE ACT.</p>
