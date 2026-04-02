@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navbar from './components/Navbar';
@@ -12,6 +12,7 @@ import ProductShowcase from './components/ProductShowcase';
 import { GlitchText, CyberButton, SectionHeader, BootSequence, DecryptHover } from './components/HackerUI';
 import { StructuredData } from './components/StructuredData';
 import HackerCursor from './components/HackerCursor';
+import PretextFlow from './components/PretextFlow';
 import { ShieldCheck, Bot, Link, Layers, Code, Server, ChevronDown, Hexagon, Lock, Activity, Database } from 'lucide-react';
 
 // Register Plugin
@@ -20,6 +21,7 @@ gsap.registerPlugin(ScrollTrigger);
 const App: React.FC = () => {
   const [booting, setBooting] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const handleBootComplete = useCallback(() => setBooting(false), []);
   
   // Refs for ScrollTriggers
   const heroRef = useRef<HTMLElement>(null);
@@ -59,7 +61,7 @@ const App: React.FC = () => {
   if (!mounted) return null;
 
   if (booting) {
-    return <BootSequence onComplete={() => setBooting(false)} />;
+    return <BootSequence onComplete={handleBootComplete} />;
   }
 
   return (
@@ -223,9 +225,9 @@ const App: React.FC = () => {
                  
                  <div className="bg-gray-900/50 p-6 border-l-4 border-green-500 clip-corner-2 relative group hover:bg-gray-900/70 transition-colors">
                    <div className="absolute -inset-1 bg-green-500/10 blur transition-opacity opacity-0 group-hover:opacity-100"></div>
-                   <p className="text-gray-300 leading-relaxed font-mono relative z-10">
-                     <strong>Chainfind</strong> is an elite collective of technologists operating at the intersection of <strong>Artificial Intelligence</strong>, <strong>Blockchain</strong>, and <strong>Network Security</strong>. We don't just build software; we architect decentralized ecosystems and intelligent agents that operate securely in the shadows of the digital infrastructure.
-                   </p>
+                   <div className="relative z-10">
+                     <PretextFlow />
+                   </div>
                  </div>
 
                  <div className="grid grid-cols-2 gap-4">

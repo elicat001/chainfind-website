@@ -181,9 +181,11 @@ export const SectionHeader: React.FC<{ title: string; subtitle: string }> = ({ t
 };
 
 export const BootSequence: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
   const [lines, setLines] = React.useState<string[]>([]);
-  
+  const [fading, setFading] = React.useState(false);
+
   React.useEffect(() => {
     const sequence = [
       "INITIALIZING_CHAIN_CORE...",
@@ -194,32 +196,32 @@ export const BootSequence: React.FC<{ onComplete: () => void }> = ({ onComplete 
       "DECRYPTING_USER_INTERFACE...",
       "ACCESS_GRANTED."
     ];
-    
+
     let delay = 0;
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
     sequence.forEach((line, index) => {
       delay += Math.random() * 200 + 100;
-      setTimeout(() => {
+      timeouts.push(setTimeout(() => {
         setLines(prev => [...prev, line]);
         if (index === sequence.length - 1) {
-          // Fade out transition
-          gsap.to(containerRef.current, {
-            opacity: 0,
-            duration: 1,
-            delay: 0.5,
-            onComplete: onComplete
-          });
+          timeouts.push(setTimeout(() => setFading(true), 500));
+          timeouts.push(setTimeout(() => onCompleteRef.current(), 1500));
         }
-      }, delay);
+      }, delay));
     });
-  }, [onComplete]);
+    return () => timeouts.forEach(clearTimeout);
+  }, []);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 bg-black z-[100] flex items-center justify-center font-mono text-green-500 p-8">
+    <div
+      className="fixed inset-0 bg-black z-[100] flex items-center justify-center font-mono text-green-500 p-8"
+      style={{ opacity: fading ? 0 : 1, transition: 'opacity 1s ease' }}
+    >
        <div className="w-full max-w-lg">
           {lines.map((line, i) => (
             <div key={i} className="mb-1">
               <span className="opacity-50 mr-2">
-                {new Date().toLocaleTimeString()} :: 
+                {new Date().toLocaleTimeString()} ::
               </span>
               {line}
             </div>
